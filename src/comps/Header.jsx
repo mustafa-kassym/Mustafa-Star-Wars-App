@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Button,
     Container,
@@ -13,21 +13,47 @@ import {
 import logo from "../media/logo.png";
 import "bootstrap/dist/css/bootstrap.min.css"
 import {NavLink} from "react-router-dom";
-import {Route, Routes} from "react-router";
+import {Route, Routes, useLocation} from "react-router";
 import Home from "../pages/Home";
 import "../styles/App.css";
 import Planets from "../pages/Planets";
 import Characters from "../pages/Characters";
 import Starships from "../pages/Starships";
 
-const Header = () => {
+const Header = (props) => {
+
+    const {setIsHomePage} = props;
+
+    const [searchInput, setSearchInput] = useState("");
+    const [searchText, setSearchText] = useState("");
+
+    const location = useLocation();
+
+    const handleInput = (event) => {
+        setSearchInput(event.target.value);
+    };
+
+    const handleSearch = () => {
+        setSearchText(searchInput);
+    };
+
+    const handleReset = () => {
+        setSearchInput("");
+        setSearchText("");
+    };
+
+
+
+    console.log(searchText);
+
+
     return (
-        <div style={{display: "block", height: "2px"}}>
+        <div>
             <Navbar collapseOnSelect bg="light" variant="light" expand="md">
                 <Container>
                     <Nav>
                         <NavbarBrand>
-                            <Nav.Link as={NavLink} to="/">
+                            <Nav.Link as={NavLink} to="/" onClick={() => setIsHomePage(true)}>
                                 <img src={logo}
                                      alt="logo"
                                      width="70px"
@@ -41,18 +67,21 @@ const Header = () => {
 
                     <NavbarCollapse id={"responsive-navbar-nav"} className="justify-content-between">
                         <Nav>
-                            <Nav.Link as={NavLink} to="/">Home</Nav.Link>
-                            <Nav.Link as={NavLink} to="/planets">Planets</Nav.Link>
-                            <Nav.Link as={NavLink} to="/characters">Characters</Nav.Link>
-                            <Nav.Link as={NavLink} to="/spaceships">Spaceships</Nav.Link>
+                            <Nav.Link as={NavLink} to="/" onClick={() => setIsHomePage(true)}>Home</Nav.Link>
+                            <Nav.Link as={NavLink} to="/planets" onClick={() => setIsHomePage(false)}>Planets</Nav.Link>
+                            <Nav.Link as={NavLink} to="/characters" onClick={() => setIsHomePage(false)}>Characters</Nav.Link>
+                            <Nav.Link as={NavLink} to="/starships" onClick={() => setIsHomePage(false)}>Starships</Nav.Link>
                         </Nav>
 
+                        {location.pathname !== "/" &&
                         <Form className="ms-auto">
                             <div className="d-flex">
-                                <FormControl type="text" className="me-sm-2"/>
-                                <Button variant="warning" className="me-auto">Search</Button>
+                                <FormControl onChange={handleInput} type="text" className="me-sm-2" value={searchInput}/>
+                                <Button onClick={handleSearch} variant="warning" className="me-auto">Search</Button>
+                                <Button disabled={!searchInput} onClick={handleReset} variant="outline-danger" className="me-auto ms-1"> Reset </Button>
                             </div>
                         </Form>
+                        }
                     </NavbarCollapse>
 
 
@@ -61,7 +90,7 @@ const Header = () => {
 
             <Routes>
                 <Route path="/" element={<Home/>}/>
-                <Route path="/planets" element={<Planets/>}/>
+                <Route path="/planets" element={<Planets searchText={searchText}/>}/>
                 <Route path="/characters" element={<Characters/>}/>
                 <Route path="/starships" element={<Starships/>}/>
             </Routes>
